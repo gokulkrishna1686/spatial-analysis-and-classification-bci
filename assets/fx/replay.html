@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: "Fraunces"; src: url("/app/static/fonts/Fraunces.ttf"); }
+@font-face { font-family: "Plex Mono"; src: url("/app/static/fonts/IBMPlexMono-Regular.ttf"); }
+@font-face { font-family: "Plex Mono"; src: url("/app/static/fonts/IBMPlexMono-SemiBold.ttf"); font-weight: 600; }
+:root { --paper:#F5F2EA; --card:#FBF9F4; --ink:#17191E; --muted:#6B6F76; --rule:#D8D2C4; --verm:#D6492A; }
+html,body { margin:0; background:transparent; font-family:"Plex Mono", monospace; color:var(--ink); }
+.wrap { border:1.5px solid var(--ink); background:var(--ink); color:var(--paper); padding:14px 16px 12px; position:relative; overflow:hidden; }
+.top { display:flex; justify-content:space-between; align-items:baseline; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#A9A49A; }
+.top b { color:var(--paper); font-weight:600; }
+#arena { width:100%; height:190px; display:block; margin-top:6px; }
+#tl { width:100%; height:120px; display:block; margin-top:4px; }
+.ctrl { display:flex; gap:10px; align-items:center; margin-top:8px; font-size:11px; }
+button { font-family:"Plex Mono", monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; background:var(--verm); color:#fff; border:1px solid var(--paper); padding:6px 12px; cursor:pointer; box-shadow:2px 2px 0 var(--paper); }
+button:active { transform:translate(2px,2px); box-shadow:none; }
+button.ghost { background:transparent; }
+.verdict { position:absolute; left:50%; top:86px; transform:translate(-50%,-50%) rotate(-4deg) scale(.6); opacity:0; transition:all .35s cubic-bezier(.2,.9,.3,1.4);
+  font-family:"Plex Mono"; font-weight:600; font-size:17px; letter-spacing:.2em; padding:8px 14px; border:3px solid currentColor; background:rgba(23,25,30,.85); }
+.verdict.show { opacity:1; transform:translate(-50%,-50%) rotate(-4deg) scale(1); }
+.scan { position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px); }
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top"><span>Live BCI replay · trial <b id="tid"></b></span><span>true intention: <b id="truth"></b></span><span id="clock">t = 0.00 s</span></div>
+  <svg id="arena" viewBox="0 0 800 190" preserveAspectRatio="none"></svg>
+  <div id="verdict" class="verdict"></div>
+  <svg id="tl" viewBox="0 0 800 120" preserveAspectRatio="none"></svg>
+  <div class="ctrl"><button id="play">▶ play</button><button class="ghost" id="slow">speed ×1</button>
+    <span style="color:#A9A49A">The cursor is driven by the real out-of-fold classifier output in a sliding window. The model never saw this trial while training.</span></div>
+  <div class="scan"></div>
+</div>
+<script>
+const D = __DATA__;
+const NS = "http://www.w3.org/2000/svg";
+const A = document.getElementById("arena"), T = document.getElementById("tl");
+document.getElementById("tid").textContent = D.trial;
+document.getElementById("truth").textContent = D.truth.replace("_"," ");
+document.getElementById("truth").style.color = D.colors[D.classes.indexOf(D.truth)];
+function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+// arena: two targets, centre line, cursor with trail
+el("line", {x1:400,y1:20,x2:400,y2:170,stroke:"#3A3E46","stroke-dasharray":"3 5"}, A);
+for (let i=0;i<2;i++){
+  const x = i===0 ? 40 : 700;
+  el("rect", {x:x, y:45, width:60, height:100, fill:"none", stroke:D.colors[i], "stroke-width":2.5}, A);
+  const t = el("text", {x:x+30, y:36, fill:D.colors[i], "text-anchor":"middle", "font-size":13, "font-family":"Plex Mono", "letter-spacing":"2"}, A);
+  t.textContent = D.classes[i].replace("_"," ").toUpperCase();
+}
+const fillL = el("rect", {x:40,y:145,width:60,height:0,fill:D.colors[0],opacity:.35}, A);
+const fillR = el("rect", {x:700,y:145,width:60,height:0,fill:D.colors[1],opacity:.35}, A);
+const trail = el("polyline", {fill:"none", stroke:"#F5F2EA", "stroke-opacity":.35, "stroke-width":1.5}, A);
+const cur = el("circle", {cx:400, cy:95, r:13, fill:"#F5F2EA", stroke:"#D6492A", "stroke-width":3}, A);
+// timeline
+const n = D.t.length, tmin = D.t[0], tmax = D.t[n-1];
+const X = t => 10 + (t - tmin) / (tmax - tmin) * 780, Y = p => 105 - p * 90;
+el("line", {x1:10,y1:Y(.5),x2:790,y2:Y(.5),stroke:"#3A3E46","stroke-dasharray":"2 4"}, T);
+if (D.cue >= tmin && D.cue <= tmax){ el("line", {x1:X(D.cue),y1:8,x2:X(D.cue),y2:110,stroke:"#C08A1E"}, T);
+  const c = el("text", {x:X(D.cue)+4,y:18,fill:"#C08A1E","font-size":10,"font-family":"Plex Mono"}, T); c.textContent="CUE"; }
+const lab = el("text", {x:12,y:16,fill:"#A9A49A","font-size":10,"font-family":"Plex Mono"}, T); lab.textContent = "P(" + D.classes[1].replace("_"," ") + ")";
+const path = el("polyline", {fill:"none", stroke:D.colors[1], "stroke-width":2.2}, T);
+const head = el("line", {x1:10,y1:5,x2:10,y2:112,stroke:"#F5F2EA","stroke-width":1}, T);
+let speed = 1, raf = null;
+document.getElementById("slow").onclick = e => { speed = speed === 1 ? 0.5 : (speed === 0.5 ? 2 : 1); e.target.textContent = "speed ×" + speed; };
+function run(){
+  if (raf) cancelAnimationFrame(raf);
+  document.getElementById("verdict").className = "verdict";
+  const dur = 5200 / speed; let start = null; let pos = 400, pts = [];
+  function frame(ts){
+    if (!start) start = ts;
+    const f = Math.min(1, (ts - start) / dur), k = f * (n - 1), i = Math.floor(k), w = k - i;
+    const p = i >= n - 1 ? D.p[n-1] : D.p[i] * (1 - w) + D.p[i+1] * w;
+    const target = 70 + p * 660; pos += (target - pos) * 0.12;
+    cur.setAttribute("cx", pos); pts.push(pos.toFixed(1) + "," + (95 + Math.sin(ts/180)*3).toFixed(1)); if (pts.length > 60) pts.shift();
+    trail.setAttribute("points", pts.join(" "));
+    const lv = Math.max(0, (0.5 - p) * 2), rv = Math.max(0, (p - 0.5) * 2);
+    fillL.setAttribute("height", lv * 100); fillL.setAttribute("y", 145 - lv * 100);
+    fillR.setAttribute("height", rv * 100); fillR.setAttribute("y", 145 - rv * 100);
+    const shown = []; for (let j = 0; j <= i && j < n; j++) shown.push(X(D.t[j]).toFixed(1) + "," + Y(D.p[j]).toFixed(1));
+    if (i < n - 1) shown.push(X(D.t[i] + w * (D.t[i+1] - D.t[i])).toFixed(1) + "," + Y(p).toFixed(1));
+    path.setAttribute("points", shown.join(" "));
+    const tx = X(D.t[Math.min(i, n-1)] + (i < n-1 ? w * (D.t[i+1] - D.t[i]) : 0));
+    head.setAttribute("x1", tx); head.setAttribute("x2", tx);
+    document.getElementById("clock").textContent = "t = " + (D.t[Math.min(i,n-1)]).toFixed(2) + " s";
+    if (f < 1) raf = requestAnimationFrame(frame);
+    else {
+      const dec = D.final > 0.5 ? D.classes[1] : D.classes[0], ok = dec === D.truth, v = document.getElementById("verdict");
+      v.textContent = (ok ? "✓ " : "✗ ") + "decoded: " + dec.replace("_"," ").toUpperCase();
+      v.style.color = ok ? "#4FB3A9" : "#D6492A"; v.className = "verdict show";
+    }
+  }
+  raf = requestAnimationFrame(frame);
+}
+document.getElementById("play").onclick = run;
+setTimeout(run, 400);
+</script></body></html>
