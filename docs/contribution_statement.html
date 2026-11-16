@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Contribution statement</title>
+<style>
+  @page { size: A4; margin: 11mm 14mm 10mm; }
+  body { font-family: "Segoe UI", "IBM Plex Sans", Arial, sans-serif; font-size: 9pt; color: #1B2130; line-height: 1.32; margin: 0; }
+  h1 { font-size: 16pt; margin: 0 0 2px; font-weight: 600; }
+  .sub { color: #485062; margin: 0 0 8px; font-size: 9.5pt; }
+  .meta { display: grid; grid-template-columns: 90px 1fr; gap: 0 10px; font-size: 8.8pt; margin: 4px 0 6px; }
+  .meta b { color: #6B7383; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; margin: 4px 0 8px; }
+  th { text-align: left; font-size: 8.6pt; color: #6B7383; font-weight: 600; border-bottom: 1.2px solid #1B2130; padding: 4px 6px; }
+  td { vertical-align: top; border-bottom: 1px solid #DDE1E7; padding: 4px 6px; }
+  td.who { width: 23%; font-weight: 600; }
+  td.who span { display: block; font-weight: 400; color: #6B7383; font-size: 8.8pt; }
+  ul { margin: 0; padding-left: 15px; } li { margin: 0 0 1px; }
+  .files { color: #485062; font-size: 8.4pt; font-family: Consolas, "IBM Plex Mono", monospace; margin-top: 3px; }
+  h2 { font-size: 10pt; margin: 6px 0 2px; font-weight: 600; }
+  p { margin: 0 0 5px; }
+  .sig { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px; margin-top: 4px; }
+  .sig div { border-top: 1px solid #1B2130; padding-top: 3px; font-size: 8.6pt; height: 14px; position: relative; margin-top: 44px; }
+  .sig div b { font-weight: 600; }
+  .sig div i { position: absolute; right: 0; top: 3px; font-style: normal; color: #6B7383; }
+</style></head>
+<body>
+<h1>Contribution statement</h1>
+<p class="sub">BCI Master Studio · Spatial Analysis + Classification module · Brain-Computer Interfaces, Semester 5 · Option A (web-app module)</p>
+<div class="meta">
+  <b>Repository</b><span>https://github.com/gokulkrishna1686/spatial-analysis-and-classification-bci</span>
+  <b>Run</b><span>pip install -r requirements.txt &amp;&amp; streamlit run app.py</span>
+  <b>Team</b><span>Gokul Krishna Balaji (CS24B2053), Thirunavukarasu (CS24B2050), Sanjay K (CS24B2031), Surya V (CS24B2037)</span>
+</div>
+
+<table>
+  <tr><th>Member</th><th>Responsibilities</th></tr>
+  <tr><td class="who">Gokul Krishna Balaji<span>CS24B2053</span></td><td>
+    <ul>
+      <li>App architecture: Streamlit navigation, shared pipeline state (Apply / Undo / Reset, seed), fragments for fast linked plots.</li>
+      <li>Interface and visual design system; Plotly theme; clickable 2-D topomaps and 3-D head.</li>
+      <li>Concept demos for both pages (volume conduction, spin-a-filter, whiten-and-rotate, filters vs patterns, Riemann in 2×2; LDA threshold/ROC, chance level, over-/underfitting, leakage, cross-validation).</li>
+      <li>Integration of all parts, GitHub repository and pull requests.</li>
+    </ul>
+    <div class="files">app.py · ui.py · viz.py · toys.py · concepts_spatial.py · concepts_classify.py · assets/</div></td></tr>
+  <tr><td class="who">Thirunavukarasu<span>CS24B2050</span></td><td>
+    <ul>
+      <li>Spatial analysis on real EEG: transparent CSP implementation (eigenvalues, filters, Haufe patterns), CAR, surface Laplacian, PCA/whitening, xDAWN and Riemannian helpers.</li>
+      <li>Spatial page views: power maps, eigen-ladder and inspector, pull-apart animation, 3-D head, Beat-CSP game, fold stability, ground-truth check, Riemann distance plane.</li>
+      <li>Spatial recipe hand-off to Classification (refit inside every training fold).</li>
+    </ul>
+    <div class="files">spatial.py · pages/01_spatial.py</div></td></tr>
+  <tr><td class="who">Sanjay K<span>CS24B2031</span></td><td>
+    <ul>
+      <li>Leak-free classification: sklearn pipelines (CSP+LDA, FBCSP, tangent space, MDM, xDAWN, band power+SVM, feature sets), CV protocols (k-fold, repeated, leave-one-session/subject-out, cross-session), nested CV.</li>
+      <li>Metrics and statistics: balanced accuracy, κ, F1, AUC, ITR, binomial chance level, permutation test, benchmark (Friedman, Wilcoxon, Nadeau-Bengio, Holm).</li>
+      <li>Classification page: Build, Understand (errors, trial barcode, time-resolved decoding, replay, playground), Compete, Leakage guard, Lab log.</li>
+    </ul>
+    <div class="files">classify.py · features.py · pages/02_classify.py · assets/fx/replay.html</div></td></tr>
+  <tr><td class="who">Surya V<span>CS24B2037</span></td><td>
+    <ul>
+      <li>Data and preprocessing back end: synthetic EEG generator with known ground truth, PhysioNet / BCI Competition IV 2a / MNE / upload loaders, quality check, filtering, epoching; minimal Setup page.</li>
+      <li>Reproducibility: standalone script and notebook generation, run report, Downloads panel, parameter import/export.</li>
+      <li>Automated tests (55 tests incl. script-reproduces-app check and page smoke tests); README, user and developer guide, demo script.</li>
+    </ul>
+    <div class="files">core.py · export.py · downloads.py · pages/00_setup.py · tests/ · README.md · docs/</div></td></tr>
+</table>
+
+<h2>Shared work</h2>
+<p>All four members agreed the scope and design, tested the app in the browser, prepared the slides and present the 10-minute demo (each member speaks for about 2.5 minutes: Gokul – concept demos, Thirunavukarasu – spatial analysis, Sanjay – classification, Surya – results, statistics and reproducibility).</p>
+<h2>Use of AI tools</h2>
+<p>An AI coding assistant (Anthropic's Claude) was used to help write code, tests and documentation, as stated in the README. All members reviewed the work they are responsible for and can explain it.</p>
+
+<p style="margin-top:4px">We confirm that this statement accurately describes each member's contribution.</p>
+<div class="sig">
+  <div><b>Gokul Krishna Balaji</b> (CS24B2053) — signature<i>date</i></div>
+  <div><b>Thirunavukarasu</b> (CS24B2050) — signature<i>date</i></div>
+  <div><b>Sanjay K</b> (CS24B2031) — signature<i>date</i></div>
+  <div><b>Surya V</b> (CS24B2037) — signature<i>date</i></div>
+</div>
+</body></html>
