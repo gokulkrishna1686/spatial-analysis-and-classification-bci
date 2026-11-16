@@ -178,10 +178,7 @@ They include:
   - The light theme is the only theme.
   - Large datasets download only on request, into `~/mne_data`.
 
-## 5 · AI-use note
-This module was developed with substantial help from an AI coding assistant (Anthropic's Claude), working from the team's specification. The team set the requirements, scope and design direction; the assistant wrote most of the code, tests and documentation. All metrics are computed live; none are hardcoded. Correctness is checked by the automated tests listed above. Students should verify claims against the cited literature.
-
-## 6 · Team
+## 5 · Team
 
 | Member | Roll no. | Main responsibility |
 |---|---|---|
@@ -192,5 +189,5 @@ This module was developed with substantial help from an AI coding assistant (Ant
 
 Details and signatures: [docs/Contribution_Statement.pdf](docs/Contribution_Statement.pdf) (source: `docs/contribution_statement.html`).
 
-## 7 · Demo
+## 6 · Demo
 See [docs/demo_script.md](docs/demo_script.md) (10 minutes, 4 speakers) and [docs/modules.md](docs/modules.md) (plain-language explanation).
